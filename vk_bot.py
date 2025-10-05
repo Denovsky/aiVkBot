@@ -39,7 +39,7 @@ try:
                 user_id = event.user_id
                 write_msg(user_id, response)
 
-                data.append({"user_id": user_id, "messages_history":chat.})
+                # data.append({"user_id": user_id, "messages_history":chat.})
 
 except KeyboardInterrupt:
     print("\nKeyboardInterrupt detected. Saving up...")
@@ -54,5 +54,5 @@ finally:
     print("VK bot end")
 
 
-def saveState():
+# def saveState():
     
