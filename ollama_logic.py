@@ -1,3 +1,5 @@
+import json
+import os
 from ollama import Client
 from config import OLLAMA_TOKEN
 
@@ -6,15 +8,15 @@ class Ollama_chat():
     def __init__(self):
         self.host = "https://ollama.com"
         self.token = OLLAMA_TOKEN
-        self.model = "gpt-oss:120b"
+        self.model = "deepseek-v3.1:671b"
         self.user_role = "user"
         self.assistant_role = "assistant"
         self.response = ""
         self.messages_history = []
 
         self.initChat()
-        self.initMessage()
-        self.saveResponse()
+        # self.initMessage()
+        # self.saveResponse()
 
     def initChat(self):
         self.client = Client(
@@ -66,9 +68,44 @@ class Ollama_chat():
         self.saveResponse()
         return self.response.message.content
 
-    def getMessagesHistory(self):
-        return self.messages_history
-
     def getClient(self):
         return self.client
     
+    def getHistory(self):
+        return self.messages_history
+    
+    def saveHistory(self, filepath):
+        try:
+            with open(filepath, "w") as json_file:
+                json.dump(self.messages_history, json_file, indent=4)
+            print("History has been successfully saved")
+        except Exception as e:
+            print(f"Save error: {e}")
+
+    def loadHistory(self, filepath):
+        try:
+            with open(filepath, 'r') as file:
+                self.messages_history = json.load(file)
+            print("History has been successfully loaded")
+        except Exception as e:
+            print(f"Load error: {e}")
+
+    def clearHistory(self, filepath):
+        try:
+            os.remove(filepath)
+        except Exception as e:
+            print(f"Delete error: {e}")
+
+    def displayHistory(self):
+        for elem in self.messages_history:
+            if elem["role"] == self.assistant_role:
+                print("="*20)
+                print(elem["content"])
+
+    def saveResponseIntoFile(self, filename, index):
+        try:
+            with open(filename, 'w') as file:
+                file.write(self.messages_history[index]["content"])
+            print("Script has been saved")
+        except Exception as e:
+            print(e)
