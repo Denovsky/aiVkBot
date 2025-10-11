@@ -1,3 +1,4 @@
 config.py
-ollama_async.py
-*.json
+promts.py
+messages/*
+__pycache__/

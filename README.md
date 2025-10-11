@@ -5,3 +5,7 @@ Model gpt-oss:120b <br />
 No user memory yet <br />
 
 You can test bot by vk group: vk.com/just_group_0564
+
+ToDo:
+- questions and response undo
+- chats save

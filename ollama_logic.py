@@ -2,21 +2,27 @@ import json
 import os
 from ollama import Client
 from config import OLLAMA_TOKEN
+import promts # Содержит начальные сообщение
+# import messages_new2
 
 
 class Ollama_chat():
+
+    # Натуральные и товарные хозяйстав
+    # Товар и его своейства
+    # Деньги и их функции
     def __init__(self):
         self.host = "https://ollama.com"
         self.token = OLLAMA_TOKEN
         self.model = "deepseek-v3.1:671b"
+        # self.model = "kimi-k2:1t-cloud"
         self.user_role = "user"
         self.assistant_role = "assistant"
+        self.question = ""
         self.response = ""
         self.messages_history = []
 
         self.initChat()
-        # self.initMessage()
-        # self.saveResponse()
 
     def initChat(self):
         self.client = Client(
@@ -24,49 +30,23 @@ class Ollama_chat():
             headers={"Authorization": self.token}
         )
 
-    def initMessage(self):
-        message = {
-            "role": self.user_role,
-            "content": """You are my personal AI assistant. 
-            Your main purpose to help me with my tasks that I will sent to you.
-            You must to follow and remember next rules:
-
-            1. DON'T USE IT:
-            **bold text** or *italics*
-            Headings with ## or ===
-            Citation blocks with >
-            Unnecessary delimiters --- or ***
-            Emojis and decorations
-            
-            2. USE IT ONLY FOR THE CODE:
-            ```language ... ``` for code blocks
-            `inline_code` for individual elements
-            Regular comments // or # in the code 
-            
-            3. Respond with clear text without Markdown markup.
-            4. Use the usual line breaks and indents.
-            """
-        }
-        self.messages_history.append(message)
+    def sendMessage(self, content, role="user"): # добавляет сообщение в историю сообщений
+        self.question = content
+        self.messages_history.append(self.formatMessage(content, role))
+        
+    def getResponse(self): # получает ответ и добавляет в историю
         self.response = self.client.chat(self.model, messages=self.messages_history)
-
-    def sendMessage(self, content):
-        message = {
-            "role": self.user_role,
-            "content": content
-        }
-        self.messages_history.append(message)
-        self.response = self.client.chat(self.model, messages=self.messages_history)
-    
-    def saveResponse(self):
-        self.messages_history.append({
-            "role": self.assistant_role,
-            "content": self.response.message.content
-        })
-
-    def getResponse(self):
-        self.saveResponse()
+        self.sendMessage(self.response.message.content, self.assistant_role)
         return self.response.message.content
+
+    def formatMessage(self, content, role):
+        if content == '' or role == '':
+            return None
+        return { "role": role, "content": content }     
+    
+    def deleteStage(self):
+        del self.messages_history[-1] # delete response
+        del self.messages_history[-1] # delete question
 
     def getClient(self):
         return self.client
@@ -109,3 +89,18 @@ class Ollama_chat():
             print("Script has been saved")
         except Exception as e:
             print(e)
+
+    # def restoreHistory(self): # using after except. Using for unexpected interuptions
+    #     for i in range(len(messages_new2.messages)):
+    #         if i % 2 == 0:
+    #             message = {
+    #                 "role": self.user_role,
+    #                 "content": messages_new2.messages[i]
+    #             }
+    #             self.messages_history.append(message)
+    #         else:
+    #             message = {
+    #                 "role": self.assistant_role,
+    #                 "content": messages_new2.messages[i]
+    #             }
+    #             self.messages_history.append(message)
